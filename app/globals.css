@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+/* Class-based dark mode — next-themes writes class="dark" / class="light" to <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Design tokens ─────────────────────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+  --bg:              oklch(8.5% 0.018 260);
+  --bg-elevated:     oklch(13%  0.018 258);
+  --ink:             oklch(93%  0.010 255);
+  --ink-muted:       oklch(55%  0.018 255);
+  --ink-faint:       oklch(35%  0.015 258);
+
+  /* Primary accent — signature blue */
+  --accent:          oklch(72%  0.118 255);
+
+  /* Expanded palette — user approved "more colours" */
+  --accent-warm:     oklch(80%  0.16  55);   /* amber / gold   */
+  --accent-violet:   oklch(64%  0.22  295);  /* rich violet    */
+  --accent-teal:     oklch(74%  0.16  200);  /* teal / cyan    */
+}
+
+.light {
+  color-scheme: light;
+  --bg:              oklch(97%  0.012 255);
+  --bg-elevated:     oklch(95.5% 0.016 255);
+  --ink:             oklch(14%  0.018 255);
+  --ink-muted:       oklch(40%  0.022 255);
+  --ink-faint:       oklch(62%  0.015 255);
+}
+
+/* ── Tailwind theme mapping ─────────────────────────────────────────────── */
+@theme inline {
+  --color-bg:             var(--bg);
+  --color-elevated:       var(--bg-elevated);
+  --color-ink:            var(--ink);
+  --color-muted:          var(--ink-muted);
+  --color-faint:          var(--ink-faint);
+  --color-accent:         var(--accent);
+  --color-accent-warm:    var(--accent-warm);
+  --color-accent-violet:  var(--accent-violet);
+  --color-accent-teal:    var(--accent-teal);
+
+  --font-wordmark: var(--font-anton);
+  --font-display:  var(--font-fraunces);
+  --font-sans:     var(--font-inter);
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  background-color: var(--bg);
+  /* Cursor-reactive bloom (top layer) + static atmospheric gradients */
+  background-image:
+    radial-gradient(
+      circle 560px at var(--glow-x, -600px) var(--glow-y, -600px),
+      oklch(68% 0.14 var(--glow-hue, 255) / 0.13) 0%,
+      oklch(64% 0.10 var(--glow-hue, 255) / 0.05) 50%,
+      transparent 100%
+    ),
+    radial-gradient(ellipse 110% 55% at 8%   0%,   oklch(22% 0.07 255 / 0.55) 0%, transparent 52%),
+    radial-gradient(ellipse 80%  55% at 92%  95%,  oklch(18% 0.07 295 / 0.45) 0%, transparent 52%),
+    radial-gradient(ellipse 60%  40% at 50%  50%,  oklch(12% 0.04 260 / 0.30) 0%, transparent 70%);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+.light body {
+  background-image:
+    radial-gradient(
+      circle 560px at var(--glow-x, -600px) var(--glow-y, -600px),
+      oklch(80% 0.12 var(--glow-hue, 255) / 0.12) 0%,
+      transparent 100%
+    ),
+    radial-gradient(ellipse 100% 50% at 10% 0%,   oklch(91% 0.04 255 / 0.7) 0%, transparent 55%),
+    radial-gradient(ellipse 70%  45% at 90% 100%,  oklch(89% 0.05 295 / 0.5) 0%, transparent 55%);
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  body { transition: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
