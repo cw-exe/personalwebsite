@@ -213,7 +213,7 @@ export const contact = {
     url: "https://instagram.com/chinwei.exe",
   },
   location: {
-    label: "Kuala Lumpur· Malaysia",
+    label: "Kuala Lumpur · Malaysia",
     note: "🇲🇾 studying in Selangor at UKM, open to meetups in Ipoh, Perak",
   },
   openTo: [
