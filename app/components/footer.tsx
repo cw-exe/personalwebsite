@@ -4,10 +4,10 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 
 const NAV = [
-  { href: "/about",      label: "About" },
-  { href: "/experience", label: "Experience" },
-  { href: "/projects",   label: "Projects" },
-  { href: "/blog",       label: "Blog" },
+  { href: "/about",      label: "about" },
+  { href: "/experience", label: "experience" },
+  { href: "/projects",   label: "ventures" },
+  { href: "/blog",       label: "writing" },
 ] as const;
 
 export function Footer() {
@@ -18,47 +18,61 @@ export function Footer() {
       {...(reduce
         ? {}
         : {
-            initial: { opacity: 0 },
-            whileInView: { opacity: 1 },
-            viewport: { once: true },
-            transition: { duration: 0.6 },
+            initial: { opacity: 0, y: 20 },
+            whileInView: { opacity: 1, y: 0 },
+            viewport: { once: true, margin: "-40px" },
+            transition: { type: "spring", stiffness: 200, damping: 22 },
           })}
-      className="border-t border-faint/20 px-6 md:px-12 lg:px-20 py-12"
+      className="relative px-6 md:px-10 lg:px-16 pt-16 pb-10"
     >
-      <div className="max-w-screen-xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-        {/* Wordmark */}
-        <Link
-          href="/"
-          className="font-wordmark text-base tracking-[0.12em] text-ink hover:text-accent transition-colors duration-300 w-fit"
-          aria-label="Chin Wei Ling — home"
-        >
-          CWL
-        </Link>
+      <div className="max-w-screen-2xl mx-auto">
+        {/* Sticker card */}
+        <div className="relative bg-elevated rounded-[32px] border-2 border-ink/10 shadow-[0_10px_30px_-14px_rgba(26,37,64,0.20)] px-6 md:px-10 py-10 md:py-12 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
 
-        {/* Nav links */}
-        <ul className="flex flex-wrap gap-6 list-none m-0 p-0">
-          {NAV.map(({ href, label }) => (
-            <li key={href}>
-              <Link
-                href={href}
-                className="font-sans text-sm text-muted hover:text-ink transition-colors duration-200 tracking-wide"
-              >
-                {label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+          {/* Left — sign-off */}
+          <div className="max-w-md">
+            <p className="font-display text-2xl md:text-3xl font-semibold text-ink leading-tight">
+              thanks for stopping by
+              <span className="inline-block ml-1" aria-hidden>✨</span>
+            </p>
+            <p className="font-sans text-sm text-muted mt-3">
+              got a question, an idea, or just want to chat? my inbox is open.
+            </p>
+            <a
+              href="mailto:lingchinwei0306@gmail.com"
+              className="mt-4 inline-flex items-center gap-2 font-sans text-sm font-medium px-4 py-2 rounded-full bg-ink text-bg hover:bg-accent-deep transition-colors duration-200"
+            >
+              lingchinwei0306@gmail.com
+              <span aria-hidden>→</span>
+            </a>
+          </div>
 
-        {/* Contact + copyright */}
-        <div className="flex flex-col gap-1 md:items-end">
-          <a
-            href="mailto:lingchinwei0306@gmail.com"
-            className="font-sans text-sm text-accent hover:text-ink transition-colors duration-200 tracking-wide"
+          {/* Right — mini nav */}
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 md:justify-end">
+            {NAV.map(({ href, label }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className="font-sans text-sm text-muted hover:text-ink transition-colors duration-200"
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Bottom line */}
+        <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <Link
+            href="/"
+            className="font-wordmark text-lg tracking-[0.08em] text-ink/70 hover:text-ink transition-colors"
+            aria-label="Chin Wei Ling — home"
           >
-            lingchinwei0306@gmail.com
-          </a>
+            CWL
+          </Link>
           <p className="font-sans text-xs text-faint">
-            © {new Date().getFullYear()} Chin Wei Ling
+            © {new Date().getFullYear()} chin wei ling · made with too much coffee ☕
           </p>
         </div>
       </div>
