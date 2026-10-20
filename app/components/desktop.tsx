@@ -10,6 +10,7 @@ import { Window } from "./window";
 import { PhoneHome } from "./phone-home";
 import { MobileSheet } from "./mobile-sheet";
 import { ToastStack, type ToastData } from "./toast";
+import { useSfx } from "./sfx";
 import {
   APP_COMPONENTS,
   APP_TITLES,
@@ -41,6 +42,7 @@ export function Desktop({ initialApp = null }: { initialApp?: AppId | null }) {
   const reduce = useReducedMotion();
   const [openApp, setOpenApp] = useState<AppId | null>(initialApp);
   const [toasts, setToasts] = useState<ToastData[]>([]);
+  const sfx = useSfx();
 
   const pushToast = (t: Omit<ToastData, "id">) => {
     setToasts((prev) => [...prev, { ...t, id: Date.now() + Math.random() }]);
@@ -76,6 +78,7 @@ export function Desktop({ initialApp = null }: { initialApp?: AppId | null }) {
   }, []);
 
   const handleShortcut = (target: string) => {
+    sfx.play("click");
     if (target === "resume") {
       pushToast({
         app: "Finder",
@@ -111,10 +114,27 @@ export function Desktop({ initialApp = null }: { initialApp?: AppId | null }) {
               onDoubleClick={() => handleShortcut(s.target)}
               onClick={() => handleShortcut(s.target)}
               initial={reduce ? false : { opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={reduce ? { duration: 0 } : { delay: 0.25 + i * 0.06, duration: 0.4, ease: "easeOut" }}
-              whileHover={reduce ? {} : { y: -3 }}
-              whileTap={reduce ? {} : { scale: 0.95 }}
+              animate={
+                reduce
+                  ? { opacity: 1, y: 0 }
+                  : {
+                      opacity: 1,
+                      /* gentle idle bob — each shortcut phased so they don't move in unison */
+                      y: [0, -6, 0, 4, 0],
+                      rotate: [0, 1.2, 0, -1.2, 0],
+                    }
+              }
+              transition={
+                reduce
+                  ? { duration: 0 }
+                  : {
+                      opacity: { delay: 0.25 + i * 0.06, duration: 0.4, ease: "easeOut" },
+                      y: { duration: 6 + i * 0.7, repeat: Infinity, ease: "easeInOut", delay: 0.6 + i * 0.35 },
+                      rotate: { duration: 6 + i * 0.7, repeat: Infinity, ease: "easeInOut", delay: 0.6 + i * 0.35 },
+                    }
+              }
+              whileHover={reduce ? {} : { y: -8, scale: 1.08, rotate: 0 }}
+              whileTap={reduce ? {} : { scale: 0.9, rotate: -4 }}
               className="pointer-events-auto flex flex-col items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/60 rounded-lg p-1"
               aria-label={`Open ${s.label}`}
             >

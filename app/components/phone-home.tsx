@@ -14,6 +14,8 @@ import {
 } from "./app-icons";
 import type { AppId } from "./apps";
 import { hero, TINT_HIGHLIGHT_CLASS } from "../content/site";
+import { SpeakerToggle } from "./menu-bar";
+import { useSfx } from "./sfx";
 
 /* iOS home-screen layout used below the md: breakpoint. Renders on top of
    the shared wallpaper. Six apps in a 3×2 grid, iOS-style status bar,
@@ -30,6 +32,11 @@ const APPS: Array<{ id: AppId; label: string; Icon: React.FC<{ size?: number }> 
 
 export function PhoneHome({ onOpen }: { onOpen: (id: AppId) => void }) {
   const reduce = useReducedMotion();
+  const sfx = useSfx();
+  const openApp = (id: AppId) => {
+    sfx.play("click");
+    onOpen(id);
+  };
 
   return (
     <div className="md:hidden absolute inset-0 z-20 flex flex-col pointer-events-none">
@@ -38,8 +45,22 @@ export function PhoneHome({ onOpen }: { onOpen: (id: AppId) => void }) {
       {/* Polaroid portrait */}
       <motion.figure
         initial={reduce ? false : { opacity: 0, y: 12, rotate: -6, scale: 0.92 }}
-        animate={{ opacity: 1, y: 0, rotate: -3, scale: 1 }}
-        transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 220, damping: 20, delay: 0.08 }}
+        animate={
+          reduce
+            ? { opacity: 1, y: 0, rotate: -3, scale: 1 }
+            : { opacity: 1, y: [0, -5, 0, 4, 0], rotate: [-3, -4.5, -3, -1.5, -3], scale: 1 }
+        }
+        transition={
+          reduce
+            ? { duration: 0 }
+            : {
+                opacity: { type: "spring", stiffness: 220, damping: 20, delay: 0.08 },
+                scale:   { type: "spring", stiffness: 220, damping: 20, delay: 0.08 },
+                y:       { duration: 6.5, repeat: Infinity, ease: "easeInOut", delay: 0.9 },
+                rotate:  { duration: 7.5, repeat: Infinity, ease: "easeInOut", delay: 0.9 },
+              }
+        }
+        whileTap={reduce ? {} : { rotate: 3, scale: 1.03 }}
         className="pointer-events-auto self-center mt-3 relative bg-white p-3 pb-9 border-[2.5px] border-ink/85 rounded-md shadow-[0_14px_30px_-12px_rgba(26,37,64,0.45),0_6px_14px_-6px_rgba(26,37,64,0.25)]"
       >
         <span
@@ -101,13 +122,31 @@ export function PhoneHome({ onOpen }: { onOpen: (id: AppId) => void }) {
           <motion.li
             key={app.id}
             initial={reduce ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={reduce ? { duration: 0 } : { delay: 0.2 + i * 0.05, duration: 0.35, ease: "easeOut" }}
+            animate={
+              reduce
+                ? { opacity: 1, y: 0 }
+                : { opacity: 1, y: [0, -4, 0, 3, 0] }
+            }
+            transition={
+              reduce
+                ? { duration: 0 }
+                : {
+                    opacity: { delay: 0.2 + i * 0.05, duration: 0.35, ease: "easeOut" },
+                    y: {
+                      duration: 5 + (i % 3) * 0.6,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: 0.5 + (i * 0.3) % 2,
+                    },
+                  }
+            }
           >
             <motion.button
-              whileTap={reduce ? {} : { scale: 0.9 }}
+              whileHover={reduce ? {} : { y: -4, scale: 1.06, rotate: i % 2 === 0 ? -3 : 3 }}
+              whileTap={reduce ? {} : { scale: 0.88 }}
+              transition={{ type: "spring", stiffness: 420, damping: 18 }}
               type="button"
-              onClick={() => onOpen(app.id)}
+              onClick={() => openApp(app.id)}
               className="flex flex-col items-center gap-1.5 w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/60 rounded-2xl p-1"
               aria-label={`Open ${app.label}`}
             >
@@ -156,6 +195,7 @@ function PhoneStatusBar() {
         <MobileSignalIcon />
         <MobileWifiIcon />
         <MobileBatteryIcon />
+        <SpeakerToggle />
         <NightModeToggle />
       </div>
     </div>
@@ -198,13 +238,17 @@ function NightModeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+  const sfx = useSfx();
   const isDark = mounted && resolvedTheme === "dark";
   const label = isDark ? "Switch to day mode" : "Switch to night mode";
 
   return (
     <button
       type="button"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
+      onClick={() => {
+        sfx.play("toggle");
+        setTheme(isDark ? "light" : "dark");
+      }}
       aria-label={label}
       title={label}
       className="flex items-center justify-center w-6 h-6 rounded hover:bg-ink/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40"

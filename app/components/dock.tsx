@@ -12,6 +12,7 @@ import {
   IconTrash,
 } from "./app-icons";
 import type { AppId } from "./apps";
+import { useSfx } from "./sfx";
 
 /* Config of everything in the dock. Some entries open an app, some are decor. */
 export const DOCK_ITEMS: Array<
@@ -38,6 +39,7 @@ export function Dock({
 }) {
   const reduce = useReducedMotion();
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const sfx = useSfx();
 
   return (
     <motion.div
@@ -79,25 +81,45 @@ export function Dock({
             : 0;
 
           const { Icon, label } = item;
-          const handleClick =
-            item.kind === "app"
-              ? () => onOpen(item.id)
-              : item.onClick;
+          const handleClick = () => {
+            sfx.play("click");
+            if (item.kind === "app") onOpen(item.id);
+            else item.onClick();
+          };
+          const handleHover = () => {
+            setHoverIndex(i);
+            sfx.play("tick");
+          };
+
+          /* Idle bob: only when nothing is hovered — magnification takes over otherwise.
+             Each icon phased differently so the dock looks like a group breathing, not
+             a wave. Kept small (2–3px) so it doesn't compete with the magnify. */
+          const idle =
+            reduce || hoverIndex !== null
+              ? { y: lift, scale }
+              : { y: [0, -3, 0, 2, 0], scale: 1 };
+          const idleTransition =
+            reduce || hoverIndex !== null
+              ? { type: "spring" as const, stiffness: 380, damping: 24, mass: 0.6 }
+              : {
+                  y: { duration: 4.5 + (i % 3) * 0.6, repeat: Infinity, ease: "easeInOut", delay: (i * 0.35) % 2 },
+                  scale: { duration: 0.4 },
+                };
 
           return (
             <li key={item.kind === "app" ? item.id : `action-${item.id}`} className="relative">
               <button
                 type="button"
-                onMouseEnter={() => setHoverIndex(i)}
-                onFocus={() => setHoverIndex(i)}
+                onMouseEnter={handleHover}
+                onFocus={handleHover}
                 onBlur={() => setHoverIndex(null)}
                 onClick={handleClick}
                 aria-label={label}
                 className="relative block focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent-deep/70 rounded-2xl"
               >
                 <motion.div
-                  animate={{ scale, y: lift }}
-                  transition={{ type: "spring", stiffness: 380, damping: 24, mass: 0.6 }}
+                  animate={idle}
+                  transition={idleTransition}
                   className="origin-bottom"
                 >
                   <Icon size={54} />

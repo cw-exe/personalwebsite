@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect } from "react";
+import { useSfx } from "./sfx";
 
 type Props = {
   title: string;
@@ -14,14 +15,27 @@ type Props = {
 /* Cartoon window shell — traffic lights, title bar, internal-scroll content. */
 export function Window({ title, onClose, children, accent, background }: Props) {
   const reduce = useReducedMotion();
+  const sfx = useSfx();
+
+  const closeWithSfx = () => {
+    sfx.play("close");
+    onClose();
+  };
+
+  // Play the "pop" on mount — the window has just appeared onscreen.
+  useEffect(() => {
+    sfx.play("pop");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Close on escape
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") closeWithSfx();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onClose]);
 
   return (
@@ -29,7 +43,7 @@ export function Window({ title, onClose, children, accent, background }: Props) 
       {/* Backdrop — transparent, click-to-close (wallpaper stays visible) */}
       <motion.button
         aria-label="Close window"
-        onClick={onClose}
+        onClick={closeWithSfx}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -58,18 +72,31 @@ export function Window({ title, onClose, children, accent, background }: Props) 
         <div className="relative h-11 border-b-[2.5px] border-ink/85 bg-white flex items-center px-4">
           {/* Traffic lights */}
           <div className="flex items-center gap-2">
-            <button
+            <motion.button
               type="button"
-              onClick={onClose}
+              onClick={closeWithSfx}
               aria-label="Close"
-              className="group w-3.5 h-3.5 rounded-full bg-tl-red border-[1.5px] border-ink/70 hover:brightness-110 flex items-center justify-center"
+              whileHover={reduce ? {} : { scale: 1.25, rotate: -8 }}
+              whileTap={reduce ? {} : { scale: 0.85 }}
+              transition={{ type: "spring", stiffness: 500, damping: 18 }}
+              className="group w-3.5 h-3.5 rounded-full bg-tl-red border-[1.5px] border-ink/70 flex items-center justify-center"
             >
               <svg viewBox="0 0 8 8" className="w-2 h-2 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden>
                 <path d="M2 2l4 4M6 2l-4 4" stroke="#3b0000" strokeWidth="1.2" strokeLinecap="round" />
               </svg>
-            </button>
-            <span className="w-3.5 h-3.5 rounded-full bg-tl-yellow border-[1.5px] border-ink/70" aria-hidden />
-            <span className="w-3.5 h-3.5 rounded-full bg-tl-green border-[1.5px] border-ink/70" aria-hidden />
+            </motion.button>
+            <motion.span
+              whileHover={reduce ? {} : { scale: 1.25, y: -1, rotate: 6 }}
+              transition={{ type: "spring", stiffness: 500, damping: 18 }}
+              className="w-3.5 h-3.5 rounded-full bg-tl-yellow border-[1.5px] border-ink/70 cursor-default"
+              aria-hidden
+            />
+            <motion.span
+              whileHover={reduce ? {} : { scale: 1.25, y: -1, rotate: -6 }}
+              transition={{ type: "spring", stiffness: 500, damping: 18 }}
+              className="w-3.5 h-3.5 rounded-full bg-tl-green border-[1.5px] border-ink/70 cursor-default"
+              aria-hidden
+            />
           </div>
 
           {/* Title */}

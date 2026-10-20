@@ -19,9 +19,23 @@ export function HeroPanel() {
         {/* ── Polaroid portrait ── */}
         <motion.figure
           initial={reduce ? false : { opacity: 0, y: 20, rotate: -8, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, rotate: -4, scale: 1 }}
-          transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 220, damping: 20, delay: 0.15 }}
-          className="relative shrink-0 bg-white p-3 pb-10 border-[2.5px] border-ink/85 rounded-md shadow-[0_18px_40px_-16px_rgba(26,37,64,0.45),0_6px_14px_-6px_rgba(26,37,64,0.25)]"
+          animate={
+            reduce
+              ? { opacity: 1, y: 0, rotate: -4, scale: 1 }
+              : { opacity: 1, y: [0, -8, 0, 6, 0], rotate: [-4, -6, -4, -2, -4], scale: 1 }
+          }
+          transition={
+            reduce
+              ? { duration: 0 }
+              : {
+                  opacity: { type: "spring", stiffness: 220, damping: 20, delay: 0.15 },
+                  scale:   { type: "spring", stiffness: 220, damping: 20, delay: 0.15 },
+                  y:       { duration: 7,  repeat: Infinity, ease: "easeInOut", delay: 1.1 },
+                  rotate:  { duration: 8,  repeat: Infinity, ease: "easeInOut", delay: 1.1 },
+                }
+          }
+          whileHover={reduce ? {} : { rotate: 2, scale: 1.05, y: -6 }}
+          className="relative shrink-0 bg-white p-3 pb-10 border-[2.5px] border-ink/85 rounded-md shadow-[0_18px_40px_-16px_rgba(26,37,64,0.45),0_6px_14px_-6px_rgba(26,37,64,0.25)] cursor-grab active:cursor-grabbing"
           style={{ transformOrigin: "center" }}
         >
           <span
@@ -58,7 +72,17 @@ export function HeroPanel() {
           </p>
 
           <h1 className="font-wordmark font-semibold text-[clamp(2.75rem,6vw,4.5rem)] leading-[0.95] tracking-[-0.01em] text-ink dark:text-white mt-1">
-            {hero.name}
+            {hero.name.split("").map((ch, i) => (
+              <motion.span
+                key={`${ch}-${i}`}
+                className="inline-block"
+                whileHover={reduce ? {} : { y: -10, rotate: i % 2 === 0 ? -6 : 6, scale: 1.15 }}
+                transition={{ type: "spring", stiffness: 480, damping: 14 }}
+                style={{ transformOrigin: "50% 90%" }}
+              >
+                {ch === " " ? "\u00A0" : ch}
+              </motion.span>
+            ))}
           </h1>
 
           <p className="font-display text-[clamp(1.05rem,1.6vw,1.4rem)] text-ink dark:text-white mt-3">

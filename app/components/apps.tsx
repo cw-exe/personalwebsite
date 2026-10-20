@@ -36,13 +36,17 @@ function SectionTitle({ children, color = "var(--accent)" }: { children: React.R
 }
 
 function Chip({ children, tint = "accent" }: { children: React.ReactNode; tint?: Tint }) {
+  const reduce = useReducedMotion();
   return (
-    <span
-      className="inline-flex items-center px-3 py-1 rounded-full text-[13px] font-medium text-ink border-2 border-ink/85"
+    <motion.span
+      whileHover={reduce ? {} : { y: -2, scale: 1.06, rotate: -1.5 }}
+      whileTap={reduce ? {} : { scale: 0.94 }}
+      transition={{ type: "spring", stiffness: 400, damping: 18 }}
+      className="inline-flex items-center px-3 py-1 rounded-full text-[13px] font-medium text-ink border-2 border-ink/85 cursor-default"
       style={{ background: `${TINT_VAR[tint]}55` }}
     >
       {children}
-    </span>
+    </motion.span>
   );
 }
 
@@ -57,17 +61,23 @@ function Card({
   className?: string;
   children: React.ReactNode;
 }) {
+  const reduce = useReducedMotion();
+  /* Hover: lift slightly and exaggerate the rotate so it wiggles toward the tilt. */
+  const hoverRotate = rotate === 0 ? 0.8 : rotate * 1.9;
   return (
-    <div
+    <motion.div
+      initial={{ rotate }}
+      animate={{ rotate }}
+      whileHover={reduce ? {} : { y: -6, rotate: hoverRotate, scale: 1.015 }}
+      transition={{ type: "spring", stiffness: 320, damping: 20 }}
       className={`relative rounded-2xl border-[2.5px] border-ink/85 p-4 md:p-5 ${className}`}
       style={{
         background: tint,
         boxShadow: "0 6px 0 -1px rgba(26,37,64,0.85), 0 10px 20px -12px rgba(26,37,64,0.28)",
-        transform: `rotate(${rotate}deg)`,
       }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
 

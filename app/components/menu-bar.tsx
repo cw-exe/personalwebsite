@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { useSfx } from "./sfx";
 
 const MENUS = ["File", "Edit", "View", "Window", "Help"] as const;
 
@@ -34,28 +35,63 @@ export function MenuBar({ activeApp }: { activeApp: string | null }) {
     >
       {/* Left cluster — apple mark + active app + menus */}
       <div className="flex items-center gap-4 md:gap-5">
-        <AppleMark />
-        <span className="font-semibold hidden sm:inline">
+        <motion.span
+          whileHover={reduce ? {} : { rotate: [0, -12, 10, -6, 0], scale: 1.15 }}
+          transition={{ duration: 0.55, ease: "easeInOut" }}
+          className="inline-flex"
+        >
+          <AppleMark />
+        </motion.span>
+        <motion.span
+          key={activeApp ?? "finder-label"}
+          initial={reduce ? false : { y: -6, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 400, damping: 24 }}
+          className="font-semibold hidden sm:inline"
+        >
           {activeApp ?? "Finder"}
-        </span>
+        </motion.span>
         <nav className="hidden md:flex items-center gap-4" aria-label="Menus (decorative)">
           {MENUS.map((m) => (
-            <button
+            <motion.button
               key={m}
               type="button"
+              whileHover={reduce ? {} : { y: -2, scale: 1.08 }}
+              whileTap={reduce ? {} : { scale: 0.94 }}
+              transition={{ type: "spring", stiffness: 500, damping: 18 }}
               className="hover:bg-ink/10 rounded px-1.5 py-0.5 transition-colors text-ink/85"
             >
               {m}
-            </button>
+            </motion.button>
           ))}
         </nav>
       </div>
 
       {/* Right cluster — status */}
       <div className="flex items-center gap-3 md:gap-4 text-ink/85">
-        <BatteryIcon />
-        <WifiIcon />
-        <SearchIcon />
+        <motion.span
+          whileHover={reduce ? {} : { scale: 1.15, rotate: -4 }}
+          transition={{ type: "spring", stiffness: 500, damping: 20 }}
+          className="inline-flex"
+        >
+          <BatteryIcon />
+        </motion.span>
+        <motion.span
+          whileHover={reduce ? {} : { scale: 1.2 }}
+          animate={reduce ? {} : { scale: [1, 1.05, 1] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          className="inline-flex"
+        >
+          <WifiIcon />
+        </motion.span>
+        <motion.span
+          whileHover={reduce ? {} : { rotate: [0, -20, 20, -10, 0], scale: 1.2 }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+          className="inline-flex"
+        >
+          <SearchIcon />
+        </motion.span>
+        <SpeakerToggle />
         <NightModeToggle />
         <span className="hidden sm:inline text-[12.5px] tabular-nums">
           {now ? formatClock(now) : "\u00A0"}
@@ -112,6 +148,7 @@ function NightModeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+  const sfx = useSfx();
 
   const isDark = mounted && resolvedTheme === "dark";
   const label = isDark ? "Switch to day mode" : "Switch to night mode";
@@ -119,7 +156,10 @@ function NightModeToggle() {
   return (
     <button
       type="button"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
+      onClick={() => {
+        sfx.play("toggle");
+        setTheme(isDark ? "light" : "dark");
+      }}
       aria-label={label}
       title={label}
       className="flex items-center justify-center w-6 h-6 rounded hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40"
@@ -138,6 +178,36 @@ function NightModeToggle() {
             d="M12.8 9.6A6.2 6.2 0 0 1 5.4 2.2 6.2 6.2 0 1 0 12.8 9.6Z"
             stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"
           />
+        </svg>
+      )}
+    </button>
+  );
+}
+
+/* Speaker toggle — muted by default; unmuting plays a small "chime" so the
+   user knows sound just came on. Shared with the phone status bar. */
+export function SpeakerToggle() {
+  const { muted, toggleMute } = useSfx();
+  const label = muted ? "Turn sound on" : "Turn sound off";
+  return (
+    <button
+      type="button"
+      onClick={toggleMute}
+      aria-label={label}
+      title={label}
+      aria-pressed={!muted}
+      className="flex items-center justify-center w-6 h-6 rounded hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40"
+    >
+      {muted ? (
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path d="M2 6h2.5L8 3v10L4.5 10H2V6Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+          <path d="M11 6l4 4M15 6l-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        </svg>
+      ) : (
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path d="M2 6h2.5L8 3v10L4.5 10H2V6Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+          <path d="M10.5 5.5a3.5 3.5 0 0 1 0 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+          <path d="M12.5 3.5a6 6 0 0 1 0 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity="0.6" />
         </svg>
       )}
     </button>
