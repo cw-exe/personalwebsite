@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/app/lib/supabase-server";
+import { getSupabaseAdmin } from "@/app/lib/supabase-server";
 
 export const runtime = "nodejs";
 
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "no valid names" }, { status: 400 });
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("invites")
     .insert(rows)
     .select("code, guest_name, created_at");

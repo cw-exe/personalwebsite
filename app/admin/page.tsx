@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/app/lib/supabase-server";
+import { getSupabaseAdmin } from "@/app/lib/supabase-server";
 import { InviteManager } from "./invite-manager";
 
 export const dynamic = "force-dynamic";
@@ -20,12 +20,13 @@ type Rsvp = {
 };
 
 export default async function AdminPage() {
+  const supabase = getSupabaseAdmin();
   const [{ data: invites }, { data: rsvps }] = await Promise.all([
-    supabaseAdmin
+    supabase
       .from("invites")
       .select("code, guest_name, opened_at, created_at")
       .order("created_at", { ascending: false }),
-    supabaseAdmin
+    supabase
       .from("rsvps")
       .select("id, name, email, code, submitted_at")
       .order("submitted_at", { ascending: false }),

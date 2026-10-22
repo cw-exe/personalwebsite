@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/app/lib/supabase-server";
+import { getSupabaseAdmin } from "@/app/lib/supabase-server";
 
 export const runtime = "nodejs";
 
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "invalid email" }, { status: 400 });
   }
 
-  const { error } = await supabaseAdmin.from("rsvps").insert({
+  const { error } = await getSupabaseAdmin().from("rsvps").insert({
     name,
     email,
     code: code || null,
