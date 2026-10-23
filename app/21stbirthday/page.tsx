@@ -80,11 +80,11 @@ export default function BirthdayPage() {
   }
 
   return (
-    <main className="relative h-dvh w-dvw overflow-hidden bg-gradient-to-b from-[var(--sky-hi)] via-[var(--sky-lo)] to-[var(--bg-tinted)]">
+    <main className="window-scroll relative h-dvh w-dvw bg-gradient-to-b from-[var(--sky-hi)] via-[var(--sky-lo)] to-[var(--bg-tinted)]">
       <Confetti reduce={!!reduce} active={stage === "rsvped"} />
       <StarsBackdrop />
 
-      <div className="relative z-10 flex h-full w-full items-center justify-center px-4 py-8">
+      <div className="relative z-10 flex min-h-full w-full items-center justify-center px-4 py-10">
         <AnimatePresence mode="wait">
           {stage === "sealed" && (
             <SealedEnvelope key="sealed" onOpen={() => setStage("opened")} reduce={!!reduce} />
@@ -253,7 +253,7 @@ function Letter({
         </h1>
         <p className="mt-5 font-display text-[15px] leading-relaxed text-ink/80 md:text-base">
           I&apos;m turning twenty-one, and i&apos;d really love for u to be in the room to celebrate
-          it with me hihi! legal age finally, but i guess adulting is scary as well. The details
+          it with me hihi! I&apos;m finally legal, but i guess adulting is scary as well. The details
           are sealed behind the password — the one i sent together with the message to you!
         </p>
 
@@ -610,7 +610,7 @@ function StarsBackdrop() {
     );
   }, []);
   return (
-    <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+    <div className="pointer-events-none fixed inset-0 z-0" aria-hidden>
       {stars.map((s) => (
         <motion.span
           key={s.id}
@@ -652,7 +652,7 @@ function Confetti({ active, reduce }: { active: boolean; reduce: boolean }) {
   );
   if (!active || reduce) return null;
   return (
-    <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden>
+    <div className="pointer-events-none fixed inset-0 z-20 overflow-hidden" aria-hidden>
       {bits.map((b) => (
         <motion.span
           key={b.id}
