@@ -3,27 +3,41 @@ import { useEffect, useState } from "react";
 import type { AnalyticsSummary } from "@/app/lib/analytics";
 
 const duration = (seconds: number) => `${Math.floor(seconds / 60)}m ${Math.round(seconds % 60)}s`;
-type Report = AnalyticsSummary & {truncated: boolean; updatedAt: string};
+const HOSTS = [
+  {value: 'all', label: 'All sites'},
+  {value: 'chinwei.my', label: 'chinwei.my'},
+  {value: 'knowyourmppukm.chinwei.my', label: 'knowyourmppukm.chinwei.my'},
+  {value: 'legacy', label: 'Legacy (pre-host)'},
+] as const;
+type Host = (typeof HOSTS)[number]['value'];
+type Report = AnalyticsSummary & {truncated: boolean; updatedAt: string; host: Host};
 export function AnalyticsDashboard() {
-  const [days, setDays] = useState(7), [refresh, setRefresh] = useState(0);
+  const [days, setDays] = useState(7), [host, setHost] = useState<Host>('all'), [refresh, setRefresh] = useState(0);
   const [data, setData] = useState<Report | null>(null), [error, setError] = useState('');
   useEffect(() => {
     const controller = new AbortController();
-    fetch(`/api/admin/analytics?days=${days}`, {signal: controller.signal, cache: 'no-store'})
+    fetch(`/api/admin/analytics?days=${days}&host=${encodeURIComponent(host)}`, {signal: controller.signal, cache: 'no-store'})
       .then(async response => { const result = await response.json(); if (!response.ok) throw new Error(result.error || 'Unable to load analytics'); return result; })
       .then(result => {setData(result); setError('');})
       .catch(e => {if (e.name !== 'AbortError') setError(e.message);});
     return () => controller.abort();
-  }, [days, refresh]);
+  }, [days, host, refresh]);
   const panel = 'rounded-xl border-2 border-ink/20 bg-[var(--bg)] p-5';
+  const resetView = () => { setData(null); setError(''); };
   return <section className="mx-auto mt-10 max-w-5xl font-display text-ink" aria-label="Website analytics">
     <div className="flex flex-wrap items-end justify-between gap-4">
-      <div><p className="text-xs uppercase tracking-[0.2em] text-ink/55">Audience overview</p><h2 className="mt-1 font-wordmark text-3xl font-bold">Website analytics</h2></div>
-      <div className="flex items-center gap-3">
-        <select aria-label="Analytics date range" className="rounded-lg border border-ink/30 bg-[var(--bg)] p-2" value={days} onChange={e => {setData(null); setError(''); setDays(Number(e.target.value));}}>
+      <div>
+        <p className="text-xs uppercase tracking-[0.2em] text-ink/55">Audience overview</p>
+        <h2 className="mt-1 font-wordmark text-3xl font-bold">Website analytics</h2>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <select aria-label="Site" className="rounded-lg border border-ink/30 bg-[var(--bg)] p-2" value={host} onChange={e => {resetView(); setHost(e.target.value as Host);}}>
+          {HOSTS.map(h => <option key={h.value} value={h.value}>{h.label}</option>)}
+        </select>
+        <select aria-label="Analytics date range" className="rounded-lg border border-ink/30 bg-[var(--bg)] p-2" value={days} onChange={e => {resetView(); setDays(Number(e.target.value));}}>
           {[7,30,90].map(n => <option key={n} value={n}>Last {n} days</option>)}
         </select>
-        <button className="rounded-lg border border-ink/30 px-3 py-2" onClick={() => {setData(null); setError(''); setRefresh(n => n+1);}}>Refresh</button>
+        <button className="rounded-lg border border-ink/30 px-3 py-2" onClick={() => {resetView(); setRefresh(n => n+1);}}>Refresh</button>
       </div>
     </div>
     <p className="mt-2 text-sm text-ink/60">Malaysia time · Admin visits excluded · Collection starts after setup</p>

@@ -1,4 +1,4 @@
-export type AnalyticsView = { id: string; visitor_id: string; session_id: string; path: string; referrer: string; device: string; created_at: string; active_seconds: number };
+export type AnalyticsView = { id: string; visitor_id: string; session_id: string; path: string; referrer: string; device: string; created_at: string; active_seconds: number; host?: string | null };
 export function summarizeAnalytics(rows: AnalyticsView[], days: number, now = new Date()) {
   const sessions = new Map<string, number>();
   const daily = new Map<string, number>();

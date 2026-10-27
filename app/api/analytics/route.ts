@@ -29,11 +29,12 @@ export async function POST(req: NextRequest) {
     return new Response(null, {status: 400});
   }
   const referrer = typeof body.referrer === "string" && /^[a-z0-9.-]{1,253}$/i.test(body.referrer) ? body.referrer : "Direct";
+  const host = typeof body.host === "string" && /^[a-z0-9.-]{1,253}$/i.test(body.host) ? body.host : null;
   const device = /ipad|tablet/i.test(agent) ? "Tablet" : /mobile|android/i.test(agent) ? "Mobile" : "Desktop";
   try {
-    const {error} = await getSupabaseAdmin().rpc("record_analytics_view", {
+    const {error} = await getSupabaseAdmin().rpc("record_analytics_view_v2", {
       p_id: body.id, p_visitor: body.visitor, p_session: body.session, p_path: body.path,
-      p_referrer: referrer, p_device: device, p_seconds: body.seconds,
+      p_referrer: referrer, p_device: device, p_seconds: body.seconds, p_host: host,
     });
     if (error) throw error;
     return new Response(null, {status: 204});

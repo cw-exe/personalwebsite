@@ -20,7 +20,7 @@
   }
   function send() {
     if (!view) return;
-    const body = JSON.stringify({...view, seconds: Math.floor(view.seconds)});
+    const body = JSON.stringify({...view, host: location.host, seconds: Math.floor(view.seconds)});
     if (!navigator.sendBeacon?.(endpoint, new Blob([body], {type: 'text/plain'}))) {
       fetch(endpoint, {method: 'POST', body, keepalive: true, credentials: 'same-origin'}).catch(() => {});
     }
