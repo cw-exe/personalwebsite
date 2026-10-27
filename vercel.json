@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/ftsm-map",
+      "destination": "https://ftsmmap-app.vercel.app"
+    },
+    {
+      "source": "/ftsm-map/:path*",
+      "destination": "https://ftsmmap-app.vercel.app/:path*"
+    }
+  ]
+}
