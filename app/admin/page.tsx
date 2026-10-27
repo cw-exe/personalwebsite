@@ -1,5 +1,6 @@
 import { getSupabaseAdmin } from "@/app/lib/supabase-server";
 import { InviteManager } from "./invite-manager";
+import { AnalyticsDashboard } from "./analytics-dashboard";
 
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
@@ -56,6 +57,7 @@ export default async function AdminPage() {
           </button>
         </form>
       </header>
+      <AnalyticsDashboard />
 
       <section className="mx-auto mt-10 max-w-5xl">
         <h2 className="font-wordmark text-2xl font-bold text-ink">Invites</h2>

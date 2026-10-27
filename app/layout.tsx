@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Fredoka, Bricolage_Grotesque } from "next/font/google";
 import { Providers } from "./providers";
 import { GrainOverlay } from "./components/grain-overlay";
@@ -39,6 +40,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <GrainOverlay />
         <Providers>{children}</Providers>
+        <Script src="/analytics.js" strategy="afterInteractive" />
       </body>
     </html>
   );
