@@ -5,7 +5,7 @@ import { summarizeAnalytics, type AnalyticsView } from "@/app/lib/analytics";
 
 // Hosts allowed by the shared analytics table. "legacy" surfaces pre-host-column
 // rows written by the earlier beacon; "all" merges every row regardless of host.
-const HOSTS = ['all', 'chinwei.my', 'knowyourmppukm.chinwei.my', 'legacy'] as const;
+const HOSTS = ['all', 'chinwei.my', 'knowyourmpp.site', 'knowyourmppukm.chinwei.my', 'legacy'] as const;
 type HostFilter = (typeof HOSTS)[number];
 
 export async function GET(req: NextRequest) {

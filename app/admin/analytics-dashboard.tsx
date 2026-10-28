@@ -6,7 +6,8 @@ const duration = (seconds: number) => `${Math.floor(seconds / 60)}m ${Math.round
 const HOSTS = [
   {value: 'all', label: 'All sites'},
   {value: 'chinwei.my', label: 'chinwei.my'},
-  {value: 'knowyourmppukm.chinwei.my', label: 'knowyourmppukm.chinwei.my'},
+  {value: 'knowyourmpp.site', label: 'knowyourmpp.site'},
+  {value: 'knowyourmppukm.chinwei.my', label: 'knowyourmppukm.chinwei.my (legacy)'},
   {value: 'legacy', label: 'Legacy (pre-host)'},
 ] as const;
 type Host = (typeof HOSTS)[number]['value'];
