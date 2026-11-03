@@ -53,7 +53,7 @@ export default function TellMeSmtgPage() {
   const transition = reduce ? { duration: 0 } : { duration: 0.4, ease: [0.22, 0.9, 0.33, 1] as const };
 
   return (
-    <main className="relative min-h-dvh w-full overflow-x-hidden bg-[var(--bg)] px-4 py-14 md:py-20">
+    <main className="window-scroll relative h-dvh w-full bg-[var(--bg)] px-4 py-14 md:py-20">
       {/* Ambient blobs */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute -left-24 top-10 h-80 w-80 rounded-full bg-accent/30 blur-3xl" />
