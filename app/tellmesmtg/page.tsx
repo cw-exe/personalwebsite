@@ -188,7 +188,7 @@ export default function TellMeSmtgPage() {
 
               <p className="mt-4 text-center font-display text-xs text-ink/50">
                 {anonymous
-                  ? "You&apos;re anonymous. I won&apos;t see any name, email, or trace back to you."
+                  ? "You’re anonymous. I won’t see any name, email, or trace back to you."
                   : "Your name will be shown with your message."}
               </p>
             </motion.form>
